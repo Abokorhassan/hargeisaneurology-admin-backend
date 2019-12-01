@@ -24,17 +24,21 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // Route::post('login', 'UserController@login');
 
 Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
-    // Route::post('register', 'AuthController@register');
-    // Route::post('login', 'AuthController@login');
-    // Route::post('logout', 'AuthController@logout');
-    // Route::post('refresh', 'AuthController@refresh');
-    // Route::post('me', 'AuthController@me');
 
     // Register Route
     Route::post('register', 'UserController@register');
 
     // Login Route
     Route::post('login', 'UserController@login');
+
+    // getting the authenticated user
+    Route::post('me', 'UserController@me');
+
+    // Log out Route
+    Route::post('logout', 'UserController@logout');
+
+    // refreshing the token
+    Route::post('refresh', 'UserController@refresh');
 });
 
 //On Unauthorized Login

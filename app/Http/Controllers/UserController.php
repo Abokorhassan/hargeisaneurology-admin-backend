@@ -25,6 +25,11 @@ class UserController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
+    /**
+     * Create a User
+     * @param  Request $request
+     * @return [type]
+     */
     public function register(Request $request)
     {
         // Validating the Input
@@ -46,32 +51,48 @@ class UserController extends Controller
             // 'password' => Hash::make($request->get('password')),
             'password' => bcrypt($request->password),
         ];
-        // Registering The User using the default auth not Sentinel
-        $user = User::create($credentials);
 
-        // Assign Role
-        if ($request->role == 'admin') {
+        try {
+            // Registering The User using the default auth not Sentinel
+            $user = User::create($credentials);
 
-            // gettting the user id coz sentinel Activation::create uses a user return by Sentinel only not the default auth.
-            $sentinelUser =  Sentinel::findById($user->id);
-            $activation = Activation::create($sentinelUser); // activate the user
+            // Assign Role
+            if ($request->role == 'admin') {
 
-            // Assigning the user the "Admin" Role
-            $role = Sentinel::findRoleBySlug('admin');
-            $role->users()->attach($user);
-        } elseif ($request->role == 'user') {
+                // gettting the user id coz sentinel Activation::create uses a user return by Sentinel only not the default auth.
+                $sentinelUser =  Sentinel::findById($user->id);
+                $activation = Activation::create($sentinelUser); // activate the user
 
-            // Assigning the user the "User" Role
-            $role = Sentinel::findRoleBySlug('user');
-            $role->users()->attach($user);
-        } else {
-            // Do nothing
+                // Assigning the user the "Admin" Role
+                $role = Sentinel::findRoleBySlug('admin');
+                $role->users()->attach($user);
+            } elseif ($request->role == 'user') {
+
+                // Assigning the user the "User" Role
+                $role = Sentinel::findRoleBySlug('user');
+                $role->users()->attach($user);
+            } else {
+                // Do nothing
+            }
+
+            // Creating Json Web Token "jwt"
+            $token = JWTAuth::fromUser($user);
+
+            $reposne = [
+                'result' => true,
+                'user' => $user,
+                'token' => [
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60
+                ]
+            ];
+        } catch (Exception $e) {
+            $reposne['error'] = 'Something Went Wrong!!';
         }
 
-        // Creating Json Web Token "jwt"
-        $token = JWTAuth::fromUser($user);
-
-        return response()->json(compact('user', 'token'), 201);
+        // return response()->json(compact('user', 'token'), 201);
+        return response()->json($reposne);
     }
 
     public function login(Request $request)
@@ -100,5 +121,37 @@ class UserController extends Controller
 
         // return response()->json(compact('token'));
         return response()->json($reposne);
+    }
+
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        $reposne = ['result' => false];
+        $user = auth()->user();
+
+        if ($user) {
+            $reposne['result'] = true;
+            $reposne['user'] = $user;
+        } else {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json($reposne);
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        auth()->logout();
+
+        return response()->json(['result' => true, 'message' => 'Successfully logged out']);
     }
 }
