@@ -4,15 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
-// use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use JWTAuth;
+use Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Activation;
 use Sentinel;
 
 class UserController extends Controller
 {
+
+    /**
+     * Create a new UserController instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
+
     public function register(Request $request)
     {
         // Validating the Input
@@ -29,7 +41,7 @@ class UserController extends Controller
         // Getting Input Value
         $credentials = [
             'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
+            'second_name' => $request->second_name,
             'email' => $request->email,
             // 'password' => Hash::make($request->get('password')),
             'password' => bcrypt($request->password),
@@ -64,6 +76,7 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
+        $reposne = ['result' => false];
         // Getting Input Value
         $credentials = $request->only('email', 'password');
 
@@ -71,11 +84,21 @@ class UserController extends Controller
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
                 return response()->json(['error' => 'invalid_credentials'], 400);
+            } else {
+                $reposne = [
+                    'result' => true,
+                    'token' => [
+                        'access_token' => $token,
+                        'token_type' => 'bearer',
+                        'expires_in' => auth()->factory()->getTTL() * 60
+                    ]
+                ];
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
-        return response()->json(compact('token'));
+        // return response()->json(compact('token'));
+        return response()->json($reposne);
     }
 }
