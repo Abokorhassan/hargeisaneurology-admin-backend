@@ -104,7 +104,7 @@ class UserController extends Controller
         // Login and and Creating Json Web Token "jwt" 
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
+                return response()->json(['error' => 'There is no user record corresponding to this identifier'], 401);
             } else {
                 $reposne = [
                     'result' => true,
