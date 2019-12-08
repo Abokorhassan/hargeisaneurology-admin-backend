@@ -45,3 +45,18 @@ Route::group(['middleware' => 'api', 'prefix' => 'auth'], function ($router) {
 Route::get('error', function () {
     return response()->json(['error' => 'Invalid Token'], 401);
 })->name('login');
+
+// List doctors
+Route::get('doctors', 'DoctorController@index');
+
+// List singledoctor
+Route::get('doctor/{id}', 'DoctorController@show');
+
+// Create newdoctor
+Route::post('doctor', 'DoctorController@store');
+
+// Updatedoctor
+Route::put('doctor/{id}', 'DoctorController@update');
+
+// Deletedoctor
+Route::delete('doctor/{id}', 'DoctorController@destroy');
