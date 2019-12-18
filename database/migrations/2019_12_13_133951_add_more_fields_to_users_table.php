@@ -14,10 +14,10 @@ class AddMoreFieldsToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('third_name');
-            $table->date('dob');
-            $table->integer('age');
-            $table->string('gender');
+            $table->string('third_name')->nullable();;
+            $table->date('dob')->nullable();;
+            $table->integer('age')->nullable();;
+            $table->string('gender')->nullable();;
             $table->string('pic')->nullable();
             $table->string('address')->nullable();
             $table->integer('ph_number')->unique();
@@ -36,9 +36,9 @@ class AddMoreFieldsToUsersTable extends Migration
             $table->dropColumn('dob');
             $table->dropColumn('age');
             $table->dropColumn('gender');
-            $table->dropColumn('pic')->nullable();
-            $table->dropColumn('address')->nullable();
-            $table->dropColumn('ph_number')->unique();
+            $table->dropColumn('pic');
+            $table->dropColumn('address');
+            $table->dropColumn('ph_number');
         });
     }
 }

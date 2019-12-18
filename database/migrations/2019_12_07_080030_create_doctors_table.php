@@ -15,14 +15,14 @@ class CreateDoctorsTable extends Migration
     {
         Schema::create('doctors', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('first_name');
-            $table->string('second_name');
-            $table->string('third_name');
-            $table->string('specialty');
+            $table->string('first_name')->nullable();
+            $table->string('second_name')->nullable();
+            $table->string('third_name')->nullable();
+            $table->string('specialty')->nullable();
             $table->string('email')->unique();
-            $table->string('gender');
+            $table->string('gender')->nullable();
             $table->date('dob')->nullable();
-            $table->integer('age');
+            $table->integer('age')->nullable();
             $table->string('pic')->nullable();
             $table->string('address')->nullable();
             $table->integer('ph_number')->unique();

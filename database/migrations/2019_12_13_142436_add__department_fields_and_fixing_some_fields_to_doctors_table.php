@@ -14,9 +14,8 @@ class AddDepartmentFieldsAndFixingSomeFieldsToDoctorsTable extends Migration
     public function up()
     {
         Schema::table('doctors', function (Blueprint $table) {
-            $table->string('department');
-            $table->renameColumn('specialty', 'speciality');
-            $table->date('dob')->change();
+            $table->string('department')->nullable();
+            $table->renameColumn('specialty', 'speciality')->nullable();
         });
     }
 

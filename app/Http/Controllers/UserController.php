@@ -36,20 +36,32 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:50',
             'second_name' => 'required|string|max:50',
+            'third_name' => 'required|string|max:50',
+            'third_name' => 'required|string|max:50',
             'email' => 'required|string|email|max:50|unique:users',
+            'dob' => 'nullable|date_format:Y-m-d',
+            'age' => 'nullable | integer|min:18|max:50',
+            'gender' => 'required | string|min:4|max:7',
             'password' => 'required|string|min:3',
+            'ph_number' => array('required', 'numeric', 'regex:/^[463]+[0-9]{6}$/', 'unique:users,ph_number'),
         ]);
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+            //  return response()->json($validator->messages(), 400);
+            return response()->json(['error' =>$validator->errors()], 400);
         }
 
         // Getting Input Value
         $credentials = [
             'first_name' => $request->first_name,
             'second_name' => $request->second_name,
+            'third_name' => $request->third_name,
             'email' => $request->email,
+            'dob' => $request->dob,
+            'age' => $request->age,
+            'gender' => $request->gender,
             // 'password' => Hash::make($request->get('password')),
             'password' => bcrypt($request->password),
+            'ph_number'=> $request->ph_number,
         ];
 
         try {
@@ -72,7 +84,7 @@ class UserController extends Controller
                 $role = Sentinel::findRoleBySlug('user');
                 $role->users()->attach($user);
             } else {
-                // Do nothing
+                // Do Nothing
             }
 
             // Creating Json Web Token "jwt"
@@ -88,7 +100,8 @@ class UserController extends Controller
                 ]
             ];
         } catch (Exception $e) {
-            $reposne['error'] = 'Something Went Wrong!!';
+            // $reposne['error'] = 'Something Went Wrong!!';
+            return response()->json(['error' => 'Something Went Wrong!!'], 500);
         }
 
         // return response()->json(compact('user', 'token'), 201);
@@ -98,6 +111,14 @@ class UserController extends Controller
     public function login(Request $request)
     {
         $reposne = ['result' => false];
+        
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:50',
+            'password' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' =>$validator->errors()], 400);
+        }
         // Getting Input Value
         $credentials = $request->only('email', 'password');
 
