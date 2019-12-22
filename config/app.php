@@ -181,6 +181,9 @@ return [
         // Tymon JWT Auth
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
+        // Intevention => Handling image
+        Intervention\Image\ImageServiceProvider::class,
+
     ],
 
     /*
@@ -240,6 +243,9 @@ return [
         // Tymon JWT Auth
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+
+         // Intevention => Handling image
+        'Image' => Intervention\Image\Facades\Image::class,
 
     ],
 
